@@ -89,12 +89,12 @@ todos/
 |__ vite.config.js
 |__ package.json
 |__ README.md
-
+```
 ---
 
 ## Instalasi & Menjalankan Project
 
-### 1) Clone repository
+#### 1) Clone repository
 ```bash
 git clone https://github.com/lynxrawrr/ToDos-LA-BrahmantioJatiPambudi.git
 cd todos
