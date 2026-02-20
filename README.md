@@ -2,7 +2,10 @@
 
 Sebuah aplikasi **Dashboard Todo App** untuk mengelola todo (Read, Create, Delete, Toggle Complete) menggunakan **React**, **Redux Toolkit**, dan async middleware berbasis **redux-thunk** (`createAsyncThunk`). Data todo diambil dari **JSONPlaceholder API**.
 
-> Catatan: JSONPlaceholder adalah mock API, sehingga aksi `POST/PATCH/DELETE` biasanya mengembalikan respons sukses, tetapi perubahan tidak benar-benar tersimpan permanen di server.
+---
+
+## Live Demo
+`https://todos-la.vercel.app/`
 
 ---
 
@@ -22,7 +25,8 @@ Sebuah aplikasi **Dashboard Todo App** untuk mengelola todo (Read, Create, Delet
 - Redux Toolkit
 - Tailwind CSS
 - React Router DOM
-- Lucide React (icons)
+- Lucide React
+- Google Font API
 
 ---
 
@@ -89,10 +93,11 @@ todos/
 ---
 
 ## Instalasi & Menjalankan Project
-#### 1) Clone repository
+
+### 1) Clone repository
 ```bash
-git clone https://github.com/lynxrawrr/KatalogQu-LA-brahmantioJatiPambudi.git
-cd katalog-qu
+git clone https://github.com/lynxrawrr/ToDos-LA-BrahmantioJatiPambudi.git
+cd todos
 ```
 
 #### 2) Install dependencies dan jalankan development server
@@ -104,8 +109,8 @@ npm run dev
 ---
 ## Akun Login
 ```txt
-Username: mor_2314
-Password: 83r5^_
+Email: Bebas
+Password: Bebas
 ```
 
 ---
@@ -129,10 +134,10 @@ Base URL: `https://jsonplaceholder.typicode.com/todos`
 ---
 ## Redux + Async Flow (Redux Toolkit + Thunk)
 
-Aplikasi menggunakan Redux Toolkit sebagai state management, dan operasi async dilakukan melalui createAsyncThunk yang memanfaatkan middleware redux-thunk (default di RTK).
+Aplikasi Web ini menggunakan Redux Toolkit sebagai state management, dan operasi async dilakukan melalui createAsyncThunk yang memanfaatkan middleware redux-thunk.
 *Alur*
 - `todosApi.js` : kumpulan fungsi request API (fetch/add/toggle/delete)
-- `todosSlice.js` : state global todo + reducer + extraReducers untuk handle pending/fulfilled/rejected
+- `todosSlice.js` : state global todo + reducer + extraReducers
 - Komponen UI hanya dispatch(thunk) dan membaca state dari selector
 
 ---
@@ -151,3 +156,11 @@ Aplikasi memiliki alur **Login/Register** sederhana untuk kebutuhan dashboard. S
 - Redux `authSlice` membaca state awal dari localStorage saat aplikasi dijalankan.
 - Saat **logout**, data auth dihapus dari localStorage dan state Redux di-reset.
 - Halaman tertentu dapat diproteksi dengan pengecekan state auth (misal redirect ke `/login` jika belum login).
+
+---
+
+## Referensi
+- https://jsonplaceholder.typicode.com/todos
+- https://redux-toolkit.js.org/usage/usage-guide
+- https://lucide.dev/icons/
+- https://tailwindcss.com/docs/installation/using-vite
