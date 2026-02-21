@@ -1,6 +1,5 @@
 const BASE = "https://jsonplaceholder.typicode.com/todos";
 
-// todos API helpers 
 export async function fetchTodosApi({ limit = 12 } = {}) {
   const res = await fetch(`${BASE}?_limit=${limit}`);
   if (!res.ok) throw new Error("Gagal Mengambil Todo.");

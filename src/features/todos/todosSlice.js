@@ -33,7 +33,6 @@ export const addTodo = createAsyncThunk(
   async ({ title, userId }, thunkAPI) => {
     try {
       const res = await addTodoApi({ title, userId });
-      // jsonplaceholder balikin id, tapi kadang random. Kita amankan.
       return { ...res, id: res.id ?? nanoid() };
     } catch (e) {
       return thunkAPI.rejectWithValue(e.message);
@@ -71,7 +70,6 @@ const todosSlice = createSlice({
   name: "todos",
   initialState,
   reducers: {
-    // reducer: UI filter state (all / completed)
     setFilter(state, action) {
       state.filter = action.payload;
     },
@@ -124,7 +122,7 @@ const todosSlice = createSlice({
         state.error = action.payload || "Unknown error";
       })
 
-      // delete reducers (pending/fulfilled/rejected)
+      // delete reducers
       .addCase(deleteTodo.pending, (state) => {
         state.mutation = "deleting";
         state.error = null;
