@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Tabs snapshot matches snapshot on completed tab 1`] = `
+<DocumentFragment>
+  <div
+    class="mt-6 flex items-center justify-between"
+  >
+    <button
+      class="text-sm font-semibold transition text-[var(--muted)] hover:text-[var(--page-fg)]"
+      type="button"
+    >
+      Belum Selesai
+    </button>
+    <button
+      class="text-sm font-semibold transition "
+      style="color: var(--brand-purple);"
+      type="button"
+    >
+      Selesai 
+      <span
+        class="ml-2 inline-flex align-middle"
+      >
+        <span
+          class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-[color-mix(in_srgb,var(--brand-purple)_25%,transparent)] text-(--brand-purple-dark)"
+        >
+          3 de 10
+        </span>
+      </span>
+    </button>
+  </div>
+</DocumentFragment>
+`;
+
+exports[`Tabs snapshot matches snapshot on default all tab 1`] = `
+<DocumentFragment>
+  <div
+    class="mt-6 flex items-center justify-between"
+  >
+    <button
+      class="text-sm font-semibold transition "
+      style="color: var(--brand-blue);"
+      type="button"
+    >
+      Belum Selesai
+    </button>
+    <button
+      class="text-sm font-semibold transition text-[var(--muted)] hover:text-[var(--page-fg)]"
+      type="button"
+    >
+      Selesai 
+      <span
+        class="ml-2 inline-flex align-middle"
+      >
+        <span
+          class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-(--gray-200) text-(--muted-2) dark:bg-(--gray-500) dark:text-(--gray-200)"
+        >
+          3 de 10
+        </span>
+      </span>
+    </button>
+  </div>
+</DocumentFragment>
+`;
