@@ -8,6 +8,7 @@ import {
   addTodo,
   deleteTodo,
   fetchTodos,
+  hydrateFromCache,
   setFilter,
   toggleTodo,
 } from "../features/todos/todosSlice";
@@ -19,6 +20,7 @@ import {
   selectStatus,
   selectTodos,
 } from "../features/todos/selectors";
+import { loadTodosCache } from "../utils/storage";
 
 export default function Dashboard() {
   const dispatch = useAppDispatch();
@@ -31,7 +33,22 @@ export default function Dashboard() {
   const completed = useAppSelector(selectCompletedTodos);
 
   useEffect(() => {
-    if (status === "idle") dispatch(fetchTodos());
+    if (status !== "idle") return;
+
+    const cached = loadTodosCache();
+
+    if (!navigator.onLine && cached.length) {
+      dispatch(hydrateFromCache(cached));
+      return;
+    }
+
+    dispatch(fetchTodos())
+      .unwrap()
+      .catch(() => {
+        if (cached.length) {
+          dispatch(hydrateFromCache(cached));
+        }
+      });
   }, [status, dispatch]);
 
   const visible = useMemo(
@@ -94,6 +111,14 @@ export default function Dashboard() {
             value={filter}
             onChange={onChangeFilter}
           />
+          
+          {/* Offline Info */}
+          {!navigator.onLine && all.length > 0 ? (
+            <p className="mt-3 text-xs text-(--muted)">
+              {" "}
+              You are offline. Showing cached todos.{" "}
+            </p>
+          ) : null}
 
           {/* Divider */}
           <div className="mt-4 border-t border-(--gray-200) dark:border-(--gray-500)" />
@@ -104,9 +129,7 @@ export default function Dashboard() {
               Loading...
             </p>
           ) : error ? (
-            <p className="py-10 text-center text-sm text-(--danger)">
-              {error}
-            </p>
+            <p className="py-10 text-center text-sm text-(--danger)">{error}</p>
           ) : (
             <TodoList items={visible} onToggle={onToggle} onDelete={onDelete} />
           )}

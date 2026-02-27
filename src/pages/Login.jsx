@@ -56,10 +56,14 @@ export default function Login() {
           <form onSubmit={submit} className="mt-8 space-y-5">
             {/* Email Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-(--muted-2)">
+              <label
+                htmlFor="login-email"
+                className="text-sm font-semibold text-(--muted-2)"
+              >
                 Email
               </label>
               <Input
+                id="login-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
@@ -69,10 +73,14 @@ export default function Login() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-(--muted-2)">
+              <label
+                htmlFor="login-password"
+                className="text-sm font-semibold text-(--muted-2)"
+              >
                 Password
               </label>
               <Input
+                id="login-password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 placeholder="Must be at least 8 characters."

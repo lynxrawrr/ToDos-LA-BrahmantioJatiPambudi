@@ -1,22 +1,28 @@
-// base todos 
-export const selectFilter = (s) => s.todos.filter;
-export const selectStatus = (s) => s.todos.status;
-export const selectError = (s) => s.todos.error;
-export const selectMutation = (s) => s.todos.mutation;
+import { createSelector } from "@reduxjs/toolkit";
 
-// derived list selectors 
-export const selectActiveTodos = (s) =>
-  s.todos.items.filter((t) => !t.completed);
+// slice selector
+const selectTodosState = (s) => s.todos;
 
-export const selectCompletedTodos = (s) =>
-  s.todos.items.filter((t) => t.completed);
+// base selectors
+export const selectItems = (s) => selectTodosState(s).items;
+export const selectFilter = (s) => selectTodosState(s).filter;
+export const selectStatus = (s) => selectTodosState(s).status;
+export const selectError = (s) => selectTodosState(s).error;
+export const selectMutation = (s) => selectTodosState(s).mutation;
 
-// visible list 
-export const selectTodos = (s) => {
-  const items = s.todos.items;
+// derived list selectors (memoized)
+export const selectActiveTodos = createSelector([selectItems], (items) =>
+  items.filter((t) => !t.completed),
+);
 
-  return items
+export const selectCompletedTodos = createSelector([selectItems], (items) =>
+  items.filter((t) => t.completed),
+);
+
+// visible list (sorted, memoized)
+export const selectTodos = createSelector([selectItems], (items) =>
+  items
     .map((t, i) => ({ t, i }))
     .sort((a, b) => Number(a.t.completed) - Number(b.t.completed) || a.i - b.i)
-    .map((x) => x.t);
-};
+    .map((x) => x.t),
+);

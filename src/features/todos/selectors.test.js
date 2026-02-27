@@ -4,6 +4,7 @@ import {
   selectStatus,
   selectError,
   selectMutation,
+  selectItems,
   selectActiveTodos,
   selectCompletedTodos,
   selectTodos,
@@ -23,6 +24,13 @@ function makeState(overrides = {}) {
 }
 
 describe("todos selectors - base", () => {
+  test("selectItems returns items", () => {
+    const items = [{ id: 1, title: "A", completed: false }];
+    const state = makeState({ items });
+
+    expect(selectItems(state)).toBe(items);
+  });
+
   test("selectFilter returns filter", () => {
     const state = makeState({ filter: "completed" });
     expect(selectFilter(state)).toBe("completed");
@@ -98,5 +106,71 @@ describe("todos selectors - derived", () => {
     const result = selectTodos(state);
 
     expect(result.map((t) => t.id)).toEqual([1, 2, 3, 4]);
+  });
+});
+
+describe("todos selectors - memoization", () => {
+  test("selectActiveTodos returns same reference when items input is unchanged", () => {
+    const items = [
+      { id: 1, title: "A", completed: false },
+      { id: 2, title: "B", completed: true },
+    ];
+
+    const state = makeState({ items });
+
+    const first = selectActiveTodos(state);
+    const second = selectActiveTodos(state);
+
+    expect(second).toBe(first);
+  });
+
+  test("selectCompletedTodos returns same reference when items input is unchanged", () => {
+    const items = [
+      { id: 1, title: "A", completed: false },
+      { id: 2, title: "B", completed: true },
+    ];
+
+    const state = makeState({ items });
+
+    const first = selectCompletedTodos(state);
+    const second = selectCompletedTodos(state);
+
+    expect(second).toBe(first);
+  });
+
+  test("selectTodos returns same reference when items input is unchanged", () => {
+    const items = [
+      { id: 1, title: "A", completed: false },
+      { id: 2, title: "B", completed: true },
+    ];
+
+    const state = makeState({ items });
+
+    const first = selectTodos(state);
+    const second = selectTodos(state);
+
+    expect(second).toBe(first);
+  });
+
+  test("selectTodos returns new reference when items input changes", () => {
+    const items1 = [
+      { id: 1, title: "A", completed: false },
+      { id: 2, title: "B", completed: true },
+    ];
+
+    const items2 = [
+      { id: 1, title: "A", completed: false },
+      { id: 2, title: "B", completed: true },
+      { id: 3, title: "C", completed: false },
+    ];
+
+    const state1 = makeState({ items: items1 });
+    const state2 = makeState({ items: items2 });
+
+    const first = selectTodos(state1);
+    const second = selectTodos(state2);
+
+    expect(second).not.toBe(first);
+    expect(second.map((t) => t.id)).toEqual([1, 3, 2]);
   });
 });

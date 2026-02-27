@@ -1,4 +1,3 @@
-/* eslint-env jest */
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Dashboard from "./Dashboard";
@@ -8,13 +7,19 @@ import {
   addTodo,
   deleteTodo,
   fetchTodos,
+  hydrateFromCache,
   setFilter,
   toggleTodo,
 } from "../features/todos/todosSlice";
+import { loadTodosCache } from "../utils/storage";
 
 jest.mock("../app/hooks", () => ({
   useAppDispatch: jest.fn(),
   useAppSelector: jest.fn(),
+}));
+
+jest.mock("../utils/storage", () => ({
+  loadTodosCache: jest.fn(),
 }));
 
 // Mock child components biar fokus ke Dashboard logic
@@ -58,17 +63,18 @@ jest.mock("../components/TodoList", () => (props) => (
   </div>
 ));
 
-// Mock action creators (return plain action object supaya gampang assert dispatch)
+// Mock action creators
 jest.mock("../features/todos/todosSlice", () => ({
   addTodo: jest.fn((payload) => ({ type: "todos/addTodo", payload })),
   deleteTodo: jest.fn((id) => ({ type: "todos/deleteTodo", payload: id })),
   fetchTodos: jest.fn(() => ({ type: "todos/fetchTodos" })),
+  hydrateFromCache: jest.fn((payload) => ({
+    type: "todos/hydrateFromCache",
+    payload,
+  })),
   setFilter: jest.fn((value) => ({ type: "todos/setFilter", payload: value })),
   toggleTodo: jest.fn((payload) => ({ type: "todos/toggleTodo", payload })),
 }));
-
-// selectors asli dipakai Dashboard via useAppSelector(selectorFn),
-// tapi karena useAppSelector kita mock, selector implementation nggak perlu dimock.
 
 function setupSelectorState({
   status = "idle",
@@ -78,7 +84,7 @@ function setupSelectorState({
   all = [],
   completed = [],
 } = {}) {
-  // Urutan panggilan useAppSelector di Dashboard:
+  // Urutan useAppSelector di Dashboard:
   // status, error, filter, mutation, all, completed
   useAppSelector
     .mockReturnValueOnce(status)
@@ -89,16 +95,31 @@ function setupSelectorState({
     .mockReturnValueOnce(completed);
 }
 
+function setNavigatorOnline(value) {
+  Object.defineProperty(window.navigator, "onLine", {
+    configurable: true,
+    get: () => value,
+  });
+}
+
 describe("Dashboard", () => {
   let dispatch;
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dispatch = jest.fn();
+
+    dispatch = jest.fn(() => ({
+      unwrap: () => ({
+        catch: jest.fn(),
+      }),
+    }));
+
     useAppDispatch.mockReturnValue(dispatch);
+    loadTodosCache.mockReturnValue([]);
+    setNavigatorOnline(true);
   });
 
-  test("dispatches fetchTodos on mount when status is idle", () => {
+  test("dispatches fetchTodos on mount when status is idle and online", () => {
     setupSelectorState({
       status: "idle",
       all: [],
@@ -107,8 +128,33 @@ describe("Dashboard", () => {
 
     render(<Dashboard />);
 
+    expect(loadTodosCache).toHaveBeenCalledTimes(1);
     expect(fetchTodos).toHaveBeenCalledTimes(1);
     expect(dispatch).toHaveBeenCalledWith({ type: "todos/fetchTodos" });
+    expect(hydrateFromCache).not.toHaveBeenCalled();
+  });
+
+  test("hydrates from cache on mount when status is idle and offline with cached data", () => {
+    const cached = [{ id: 1, title: "Cached Todo", completed: false }];
+
+    loadTodosCache.mockReturnValue(cached);
+    setNavigatorOnline(false);
+
+    setupSelectorState({
+      status: "idle",
+      all: cached,
+      completed: [],
+    });
+
+    render(<Dashboard />);
+
+    expect(loadTodosCache).toHaveBeenCalledTimes(1);
+    expect(fetchTodos).not.toHaveBeenCalled();
+    expect(hydrateFromCache).toHaveBeenCalledWith(cached);
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "todos/hydrateFromCache",
+      payload: cached,
+    });
   });
 
   test("does not dispatch fetchTodos when status is not idle", () => {
@@ -121,6 +167,7 @@ describe("Dashboard", () => {
     render(<Dashboard />);
 
     expect(fetchTodos).not.toHaveBeenCalled();
+    expect(hydrateFromCache).not.toHaveBeenCalled();
   });
 
   test("renders loading state", () => {
@@ -204,6 +251,42 @@ describe("Dashboard", () => {
     render(<Dashboard />);
 
     expect(screen.getByText(/Composer busy: true/i)).toBeInTheDocument();
+  });
+
+  test("renders offline info when offline and cached todos are shown", () => {
+    const all = [{ id: 1, title: "Cached Todo", completed: false }];
+
+    setNavigatorOnline(false);
+
+    setupSelectorState({
+      status: "succeeded",
+      all,
+      completed: [],
+    });
+
+    render(<Dashboard />);
+
+    expect(
+      screen.getByText("You are offline. Showing cached todos."),
+    ).toBeInTheDocument();
+  });
+
+  test("does not render offline info when online", () => {
+    const all = [{ id: 1, title: "Online Todo", completed: false }];
+
+    setNavigatorOnline(true);
+
+    setupSelectorState({
+      status: "succeeded",
+      all,
+      completed: [],
+    });
+
+    render(<Dashboard />);
+
+    expect(
+      screen.queryByText("You are offline. Showing cached todos."),
+    ).not.toBeInTheDocument();
   });
 
   test("dispatches setFilter when Tabs onChange is triggered", async () => {

@@ -1,5 +1,3 @@
-/* eslint-env jest */
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
@@ -47,10 +45,8 @@ describe("Login page", () => {
       screen.getByRole("heading", { name: /welcome, let’s login/i }),
     ).toBeInTheDocument();
 
-    expect(screen.getByPlaceholderText(/your email/i)).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
 
     const registerLink = screen.getByRole("link", { name: /register/i });
     expect(registerLink).toHaveAttribute("href", "/register");
@@ -65,10 +61,7 @@ describe("Login page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "12345678",
-    );
+    await user.type(screen.getByLabelText(/^password$/i), "12345678");
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     expect(screen.getByText("Email wajib diisi.")).toBeInTheDocument();
@@ -85,14 +78,8 @@ describe("Login page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(
-      screen.getByPlaceholderText(/your email/i),
-      "bramii@mail.com",
-    );
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "1234",
-    );
+    await user.type(screen.getByLabelText(/^email$/i), "bramii@mail.com");
+    await user.type(screen.getByLabelText(/^password$/i), "1234");
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 
     expect(
@@ -111,14 +98,8 @@ describe("Login page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(
-      screen.getByPlaceholderText(/your email/i),
-      "  bramii@mail.com  ",
-    );
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "password123",
-    );
+    await user.type(screen.getByLabelText(/^email$/i), "  bramii@mail.com  ");
+    await user.type(screen.getByLabelText(/^password$/i), "password123");
 
     await user.click(screen.getByRole("button", { name: /^login$/i }));
 

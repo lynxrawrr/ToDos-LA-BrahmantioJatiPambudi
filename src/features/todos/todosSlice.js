@@ -1,4 +1,10 @@
-import { createAsyncThunk, createSlice, nanoid } from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  nanoid,
+  current,
+} from "@reduxjs/toolkit";
+
 import {
   addTodoApi,
   deleteTodoApi,
@@ -6,13 +12,15 @@ import {
   toggleTodoApi,
 } from "./todosApi";
 
+import { saveTodosCache } from "../../utils/storage";
+
 // state: todos slice initial shape
 const initialState = {
   items: [],
-  status: "idle", 
+  status: "idle",
   error: null,
-  filter: "all", 
-  mutation: null, 
+  filter: "all",
+  mutation: null,
 };
 
 // thunk: fetch todos (GET)
@@ -75,11 +83,13 @@ const todosSlice = createSlice({
     },
     hydrateFromCache(state, action) {
       state.items = action.payload ?? [];
+      state.status = "succeeded";
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // fetch reducers 
+      // fetch reducers
       .addCase(fetchTodos.pending, (state) => {
         state.status = "loading";
         state.error = null;
@@ -87,13 +97,14 @@ const todosSlice = createSlice({
       .addCase(fetchTodos.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.items = action.payload;
+        saveTodosCache(current(state).items);
       })
       .addCase(fetchTodos.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload || "Unknown error";
       })
 
-      // add reducers 
+      // add reducers
       .addCase(addTodo.pending, (state) => {
         state.mutation = "adding";
         state.error = null;
@@ -101,13 +112,14 @@ const todosSlice = createSlice({
       .addCase(addTodo.fulfilled, (state, action) => {
         state.mutation = null;
         state.items.unshift(action.payload);
+        saveTodosCache(current(state).items);
       })
       .addCase(addTodo.rejected, (state, action) => {
         state.mutation = null;
         state.error = action.payload || "Unknown error";
       })
 
-      // toggle reducers 
+      // toggle reducers
       .addCase(toggleTodo.pending, (state) => {
         state.mutation = "toggling";
         state.error = null;
@@ -116,6 +128,7 @@ const todosSlice = createSlice({
         state.mutation = null;
         const t = state.items.find((x) => x.id === action.payload.id);
         if (t) t.completed = action.payload.completed;
+        saveTodosCache(current(state).items);
       })
       .addCase(toggleTodo.rejected, (state, action) => {
         state.mutation = null;
@@ -130,6 +143,7 @@ const todosSlice = createSlice({
       .addCase(deleteTodo.fulfilled, (state, action) => {
         state.mutation = null;
         state.items = state.items.filter((x) => x.id !== action.payload);
+        saveTodosCache(current(state).items);
       })
       .addCase(deleteTodo.rejected, (state, action) => {
         state.mutation = null;

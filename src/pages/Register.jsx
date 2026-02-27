@@ -64,10 +64,14 @@ export default function Register() {
           <form onSubmit={submit} className="mt-8 space-y-5">
             {/* Name Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-(--muted-2)">
+              <label
+                htmlFor="register-name"
+                className="text-sm font-semibold text-(--muted-2)"
+              >
                 Full Name
               </label>
               <Input
+                id="register-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Your name"
@@ -77,10 +81,14 @@ export default function Register() {
 
             {/* Email Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-(--muted-2)">
+              <label
+                htmlFor="register-email"
+                className="text-sm font-semibold text-(--muted-2)"
+              >
                 Email
               </label>
               <Input
+                id="register-email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Your email"
@@ -90,10 +98,14 @@ export default function Register() {
 
             {/* Password Field */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-(--muted-2)">
+              <label
+                htmlFor="register-password"
+                className="text-sm font-semibold text-(--muted-2)"
+              >
                 Password
               </label>
               <Input
+                id="register-password"
                 value={pw}
                 onChange={(e) => setPw(e.target.value)}
                 placeholder="Must be at least 8 characters."

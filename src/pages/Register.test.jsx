@@ -1,5 +1,3 @@
-/* eslint-env jest */
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
@@ -50,15 +48,9 @@ describe("Register page", () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByPlaceholderText(/your name/i)).toBeInTheDocument();
-
-    // Email placeholder ada 1
-    expect(screen.getByPlaceholderText(/your email/i)).toBeInTheDocument();
-
-    // Password placeholder ada 1
-    expect(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/full name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^email$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
 
     const signInLink = screen.getByRole("link", { name: /sign in/i });
     expect(signInLink).toHaveAttribute("href", "/login");
@@ -73,14 +65,8 @@ describe("Register page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(
-      screen.getByPlaceholderText(/your email/i),
-      "bramii@mail.com",
-    );
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "password123",
-    );
+    await user.type(screen.getByLabelText(/^email$/i), "bramii@mail.com");
+    await user.type(screen.getByLabelText(/^password$/i), "password123");
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
     expect(screen.getByText("Full name wajib diisi.")).toBeInTheDocument();
@@ -97,11 +83,8 @@ describe("Register page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(screen.getByPlaceholderText(/your name/i), "Bramii");
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "password123",
-    );
+    await user.type(screen.getByLabelText(/full name/i), "Bramii");
+    await user.type(screen.getByLabelText(/^password$/i), "password123");
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
     expect(screen.getByText("Email wajib diisi.")).toBeInTheDocument();
@@ -118,15 +101,9 @@ describe("Register page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(screen.getByPlaceholderText(/your name/i), "Bramii");
-    await user.type(
-      screen.getByPlaceholderText(/your email/i),
-      "bramii@mail.com",
-    );
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "1234",
-    );
+    await user.type(screen.getByLabelText(/full name/i), "Bramii");
+    await user.type(screen.getByLabelText(/^email$/i), "bramii@mail.com");
+    await user.type(screen.getByLabelText(/^password$/i), "1234");
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
     expect(
@@ -145,15 +122,9 @@ describe("Register page", () => {
       </MemoryRouter>,
     );
 
-    await user.type(screen.getByPlaceholderText(/your name/i), "  Bramii  ");
-    await user.type(
-      screen.getByPlaceholderText(/your email/i),
-      "  bramii@mail.com  ",
-    );
-    await user.type(
-      screen.getByPlaceholderText(/must be at least 8 characters/i),
-      "password123",
-    );
+    await user.type(screen.getByLabelText(/full name/i), "  Bramii  ");
+    await user.type(screen.getByLabelText(/^email$/i), "  bramii@mail.com  ");
+    await user.type(screen.getByLabelText(/^password$/i), "password123");
 
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
