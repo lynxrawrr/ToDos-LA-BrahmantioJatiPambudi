@@ -1,18 +1,15 @@
-/* eslint-env jest */
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import Header from "./Header";
 import { logout } from "../features/auth/authSlice";
 
-// mock custom hooks
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 jest.mock("../app/hooks", () => ({
   useAppDispatch: jest.fn(),
   useAppSelector: jest.fn(),
 }));
 
-// mock storage helpers (theme)
 import { loadTheme, saveTheme } from "../utils/storage";
 jest.mock("../utils/storage", () => ({
   loadTheme: jest.fn(),
@@ -42,8 +39,6 @@ describe("Header", () => {
 
     loadTheme.mockReturnValue("light");
     saveTheme.mockClear();
-
-    // reset class dark sebelum tiap test
     document.documentElement.classList.remove("dark");
 
     jest.clearAllMocks();
@@ -100,20 +95,16 @@ describe("Header", () => {
       name: /switch to dark mode/i,
     });
 
-    // awal light -> belum dark
     expect(document.documentElement.classList.contains("dark")).toBe(false);
 
-    // klik jadi dark
     await user.click(toggleBtn);
     expect(saveTheme).toHaveBeenCalledWith("dark");
     expect(document.documentElement.classList.contains("dark")).toBe(true);
 
-    // label berubah
     expect(
       screen.getByRole("button", { name: /switch to light mode/i }),
     ).toBeInTheDocument();
 
-    // klik lagi jadi light
     await user.click(
       screen.getByRole("button", { name: /switch to light mode/i }),
     );
@@ -151,12 +142,10 @@ describe("Header", () => {
       { name: "Bramii", email: "bramii@mail.com" },
     );
 
-    // buka dialog dari tombol header
     await user.click(screen.getByRole("button", { name: /^log out$/i }));
 
     const dialog = screen.getByRole("dialog");
 
-    // klik tombol confirm di dialog
     await user.click(
       within(dialog).getByRole("button", { name: /^log out$/i }),
     );

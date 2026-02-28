@@ -62,7 +62,7 @@ export default defineConfig({
               networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24, // 1 hari
+                maxAgeSeconds: 60 * 60 * 24, 
               },
               cacheableResponse: {
                 statuses: [0, 200],

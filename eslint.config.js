@@ -6,6 +6,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 
 export default defineConfig([
   globalIgnores(["dist"]),
+
   {
     files: ["**/*.{js,jsx}"],
     extends: [
@@ -15,7 +16,9 @@ export default defineConfig([
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+      },
       parserOptions: {
         ecmaVersion: "latest",
         ecmaFeatures: { jsx: true },
@@ -27,7 +30,7 @@ export default defineConfig([
     },
   },
 
-  // ✅ khusus file test (Jest globals)
+  // khusus file unit test / spec biasa
   {
     files: ["**/*.{test,spec}.{js,jsx}", "**/__tests__/**/*.{js,jsx}"],
     languageOptions: {
@@ -38,7 +41,7 @@ export default defineConfig([
     },
   },
 
-  // ✅ khusus Cypress (describe/it/beforeEach/cy/Cypress)
+  // khusus Cypress
   {
     files: ["cypress/**/*.{js,jsx}"],
     languageOptions: {
@@ -47,6 +50,8 @@ export default defineConfig([
         ...globals.mocha,
         cy: "readonly",
         Cypress: "readonly",
+        expect: "readonly",
+        assert: "readonly",
       },
     },
   },

@@ -1,4 +1,3 @@
-/* eslint-env jest */
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ConfirmDialog from "./ConfirmDialog";
@@ -105,7 +104,6 @@ describe("ConfirmDialog", () => {
       <ConfirmDialog open onCancel={onCancel} onConfirm={jest.fn()} />,
     );
 
-    // element with role="dialog" is the outer container that handles onMouseDown
     const overlay = screen.getByRole("dialog");
     fireEvent.mouseDown(overlay, { target: overlay });
 
@@ -125,7 +123,6 @@ describe("ConfirmDialog", () => {
       />,
     );
 
-    // click on inner panel content (title), not on outer overlay
     const title = screen.getByText("Dialog title");
     fireEvent.mouseDown(title);
 

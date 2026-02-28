@@ -25,8 +25,10 @@ describe("Auth pages & routing", () => {
       "be.visible",
     );
 
-    cy.get('input[placeholder="Your email"]').should("be.visible");
-    cy.get('input[type="password"]').should("be.visible");
+    cy.get("#login-email").should("be.visible");
+    cy.get("#login-password")
+      .should("be.visible")
+      .and("have.attr", "type", "password");
     cy.contains("button", /^Login$/).should("be.visible");
     cy.contains("a", "Register").should("have.attr", "href", "/register");
   });
@@ -47,18 +49,53 @@ describe("Auth pages & routing", () => {
     cy.contains("Email wajib diisi.").should("be.visible");
 
     // isi email + password pendek -> error password
-    cy.get('input[placeholder="Your email"]').type("bramii@mail.com");
-    cy.get('input[type="password"]').type("12345");
+    cy.get("#login-email").type("bramii@mail.com");
+    cy.get("#login-password").type("12345");
     cy.contains("button", /^Login$/).click();
 
     cy.contains("Password minimal 8 karakter.").should("be.visible");
   });
 
+  it("clears login error after valid submit", () => {
+    cy.visit("/login");
+
+    cy.contains("button", /^Login$/).click();
+    cy.contains("Email wajib diisi.").should("be.visible");
+
+    cy.get("#login-email").type("bramii@mail.com");
+    cy.get("#login-password").type("password123");
+    cy.contains("button", /^Login$/).click();
+    cy.wait("@getTodosAfterAuth");
+
+    cy.contains("Email wajib diisi.").should("not.exist");
+    cy.url().should("include", "/dashboard");
+  });
+
+  it("trims login email before saving user", () => {
+    cy.visit("/login");
+
+    cy.get("#login-email").type("  bramii@mail.com  ");
+    cy.get("#login-password").type("password123");
+    cy.contains("button", /^Login$/).click();
+    cy.wait("@getTodosAfterAuth");
+
+    cy.url().should("include", "/dashboard");
+
+    cy.window().then((win) => {
+      const raw = win.localStorage.getItem("todo_user");
+      expect(raw).to.not.be.null;
+
+      const user = JSON.parse(raw);
+      expect(user.email).to.equal("bramii@mail.com");
+      expect(user.name).to.equal("bramii");
+    });
+  });
+
   it("login success stores user and navigates to dashboard", () => {
     cy.visit("/login");
 
-    cy.get('input[placeholder="Your email"]').type("bramii@mail.com");
-    cy.get('input[type="password"]').type("password123");
+    cy.get("#login-email").type("bramii@mail.com");
+    cy.get("#login-password").type("password123");
     cy.contains("button", /^Login$/).click();
     cy.wait("@getTodosAfterAuth");
 
@@ -82,9 +119,11 @@ describe("Auth pages & routing", () => {
       "Create a new account so that all your note history can be saved",
     ).should("be.visible");
 
-    cy.get('input[placeholder="Your name"]').should("be.visible");
-    cy.get('input[placeholder="Your email"]').should("be.visible");
-    cy.get('input[type="password"]').should("be.visible");
+    cy.get("#register-name").should("be.visible");
+    cy.get("#register-email").should("be.visible");
+    cy.get("#register-password")
+      .should("be.visible")
+      .and("have.attr", "type", "password");
     cy.contains("button", /^Continue$/).should("be.visible");
     cy.contains("a", "Sign In").should("have.attr", "href", "/login");
   });
@@ -105,24 +144,61 @@ describe("Auth pages & routing", () => {
     cy.contains("Full name wajib diisi.").should("be.visible");
 
     // isi nama tapi email kosong
-    cy.get('input[placeholder="Your name"]').type("Bramii");
+    cy.get("#register-name").type("Bramii");
     cy.contains("button", /^Continue$/).click();
     cy.contains("Email wajib diisi.").should("be.visible");
 
     // isi email + password pendek
-    cy.get('input[placeholder="Your email"]').type("bramii@mail.com");
-    cy.get('input[type="password"]').type("12345");
+    cy.get("#register-email").type("bramii@mail.com");
+    cy.get("#register-password").type("12345");
     cy.contains("button", /^Continue$/).click();
 
     cy.contains("Password minimal 8 karakter.").should("be.visible");
   });
 
+  it("clears register error after valid submit", () => {
+    cy.visit("/register");
+
+    cy.contains("button", /^Continue$/).click();
+    cy.contains("Full name wajib diisi.").should("be.visible");
+
+    cy.get("#register-name").type("Bramii Jati");
+    cy.get("#register-email").type("bramii@mail.com");
+    cy.get("#register-password").type("password123");
+    cy.contains("button", /^Continue$/).click();
+    cy.wait("@getTodosAfterAuth");
+
+    cy.contains("Full name wajib diisi.").should("not.exist");
+    cy.url().should("include", "/dashboard");
+  });
+
+  it("trims register name and email before saving user", () => {
+    cy.visit("/register");
+
+    cy.get("#register-name").type("  Bramii Jati  ");
+    cy.get("#register-email").type("  bramii@mail.com  ");
+    cy.get("#register-password").type("password123");
+    cy.contains("button", /^Continue$/).click();
+    cy.wait("@getTodosAfterAuth");
+
+    cy.url().should("include", "/dashboard");
+
+    cy.window().then((win) => {
+      const raw = win.localStorage.getItem("todo_user");
+      expect(raw).to.not.be.null;
+
+      const user = JSON.parse(raw);
+      expect(user.name).to.equal("Bramii Jati");
+      expect(user.email).to.equal("bramii@mail.com");
+    });
+  });
+
   it("register success stores user and navigates to dashboard", () => {
     cy.visit("/register");
 
-    cy.get('input[placeholder="Your name"]').type("Bramii Jati");
-    cy.get('input[placeholder="Your email"]').type("bramii@mail.com");
-    cy.get('input[type="password"]').type("password123");
+    cy.get("#register-name").type("Bramii Jati");
+    cy.get("#register-email").type("bramii@mail.com");
+    cy.get("#register-password").type("password123");
     cy.contains("button", /^Continue$/).click();
     cy.wait("@getTodosAfterAuth");
 
@@ -182,5 +258,43 @@ describe("Auth pages & routing", () => {
 
     cy.visit("/register");
     cy.url().should("include", "/register");
+  });
+
+  it("logs out user, clears localStorage, and updates header to guest state", () => {
+    cy.visit("/login");
+
+    cy.get("#login-email").type("bramii@mail.com");
+    cy.get("#login-password").type("password123");
+    cy.contains("button", /^Login$/).click();
+    cy.wait("@getTodosAfterAuth");
+
+    cy.url().should("include", "/dashboard");
+
+    // Klik tombol logout di header
+    cy.contains("button", /^log out$/i)
+      .should("be.visible")
+      .click();
+
+    // Pastikan modal konfirmasi muncul
+    cy.contains("Log out?").should("be.visible");
+    cy.contains("You’ll need to sign in again to access your account.").should(
+      "be.visible",
+    );
+
+    // Klik tombol logout di modal
+    cy.contains("button", /^cancel$/i)
+      .parent()
+      .within(() => {
+        cy.contains("button", /^log out$/i).click();
+      });
+
+    // Auth state terhapus
+    cy.window().then((win) => {
+      expect(win.localStorage.getItem("todo_user")).to.be.null;
+    });
+
+    // Tetap di dashboard, tapi header berubah jadi guest
+    cy.url().should("include", "/dashboard");
+    cy.contains("button, a", /^login$/i).should("be.visible");
   });
 });

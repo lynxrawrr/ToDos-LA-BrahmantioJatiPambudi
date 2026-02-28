@@ -31,7 +31,6 @@ Cypress.Commands.add("mockTodosApi", (overrides = {}) => {
     { id: 3, userId: 1, title: "Belajar Cypress", completed: false },
   ];
 
-  // mutable in-memory state untuk simulasi backend
   let todos = [...initialTodos];
   let nextId = 100;
 
@@ -52,8 +51,6 @@ Cypress.Commands.add("mockTodosApi", (overrides = {}) => {
       completed: body.completed ?? false,
     };
 
-    // Dashboard slice addTodo.fulfilled -> unshift
-    // API state juga kita update biar konsisten kalau ada refetch
     todos = [newTodo, ...todos];
 
     req.reply({
@@ -89,7 +86,6 @@ Cypress.Commands.add("mockTodosApi", (overrides = {}) => {
 });
 
 Cypress.Commands.add("visitDashboard", () => {
-  // jaga localStorage agar state auth/theme tidak ganggu test
   cy.visit("/dashboard", {
     onBeforeLoad(win) {
       win.localStorage.clear();

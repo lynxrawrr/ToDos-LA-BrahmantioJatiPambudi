@@ -25,6 +25,7 @@ function TodoComposer({ onAdd, isBusy }) {
       {/* Input Field */}
       <div className="w-full">
         <Input
+          id="todo-input"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Tambah tugas baru"

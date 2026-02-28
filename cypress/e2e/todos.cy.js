@@ -1,4 +1,9 @@
 describe("Todo Dashboard E2E", () => {
+  const getTodoInput = () => cy.get("#todo-input");
+
+  const clickAddButton = () =>
+    cy.contains("button", /^tambah$/i).click({ force: true });
+
   beforeEach(() => {
     cy.mockTodosApi();
     cy.visitDashboard();
@@ -12,61 +17,63 @@ describe("Todo Dashboard E2E", () => {
   });
 
   it("adds a new todo", () => {
-    // Cari input berdasarkan placeholder / textbox
-    // karena kita belum lihat exact DOM, pakai fallback fleksibel
-    cy.get(
-      'input[type="text"], input[placeholder*="todo" i], input[placeholder*="tugas" i]',
-    )
-      .first()
-      .as("todoInput");
+    getTodoInput().as("todoInput");
 
     cy.get("@todoInput").clear().type("Belajar E2E Testing");
-
-    // Cari tombol submit tambah (fleksibel)
-    cy.contains("button", /tambah|add|simpan/i).click({ force: true });
+    clickAddButton();
 
     cy.wait("@addTodo");
 
-    // todo baru muncul
     cy.contains("Belajar E2E Testing").should("be.visible");
   });
 
   it("shows validation when adding empty todo", () => {
-    cy.contains("button", /tambah|add|simpan/i).click({ force: true });
+    clickAddButton();
 
     cy.contains("Todo tidak boleh kosong.").should("be.visible");
   });
 
+  it("clears validation error after valid todo submit", () => {
+    clickAddButton();
+    cy.contains("Todo tidak boleh kosong.").should("be.visible");
+
+    getTodoInput().clear().type("Belajar Fix Error");
+    clickAddButton();
+
+    cy.wait("@addTodo");
+
+    cy.contains("Todo tidak boleh kosong.").should("not.exist");
+    cy.contains("Belajar Fix Error").should("be.visible");
+  });
+
   it("sanitizes todo title before submit", () => {
-    cy.get(
-      'input[type="text"], input[placeholder*="todo" i], input[placeholder*="tugas" i]',
-    )
-      .first()
-      .as("todoInput");
+    getTodoInput().as("todoInput");
 
     cy.get("@todoInput").clear().type("   Belajar   Sanitasi   ");
-
-    cy.contains("button", /tambah|add|simpan/i).click({ force: true });
+    clickAddButton();
 
     cy.wait("@addTodo");
 
     cy.contains("Belajar Sanitasi").should("be.visible");
   });
 
-  it("toggles todo status", () => {
-    // pakai item yang belum completed: "Belajar React"
-    cy.get("body").then(() => {
-      cy.contains("Belajar React")
-        .closest("li")
-        .within(() => {
-          cy.get("button").first().click();
-        });
-    });
+  it("toggles todo status and moves item to completed tab", () => {
+    cy.contains("Belajar React").should("be.visible");
+
+    cy.contains("Belajar React")
+      .closest("li")
+      .within(() => {
+        cy.get("button").first().click();
+      });
 
     cy.wait("@toggleTodo");
 
-    // Assertion sederhana: item tetap ada dan request PATCH sukses
-    cy.contains("Belajar React").should("exist");
+    cy.contains("button", /^Selesai/i).click();
+
+    cy.get("ul").within(() => {
+      cy.contains("Belajar React").should("be.visible");
+      cy.contains("Belajar Redux").should("be.visible");
+    });
   });
 
   it("deletes todo after confirmation", () => {
@@ -101,7 +108,6 @@ describe("Todo Dashboard E2E", () => {
   it("filters completed todos using tabs", () => {
     cy.contains("button", /^Selesai/i).click();
 
-    // lebih stabil daripada cuma cek not.exist di within
     cy.get("ul").should("exist");
     cy.get("ul li").should("have.length", 1);
 
@@ -130,7 +136,6 @@ describe("Todo Dashboard E2E", () => {
   });
 
   it("shows empty state when API returns no todos", () => {
-    // Override intercept khusus test ini
     cy.intercept("GET", "**/todos?_limit=12", {
       statusCode: 200,
       body: [],
@@ -154,7 +159,6 @@ describe("Todo Dashboard E2E", () => {
     cy.visitDashboard();
     cy.wait("@getTodosFail");
 
-    // slice kamu bisa render pesan custom atau fallback
     cy.contains(/gagal mengambil todo|unknown error/i).should("be.visible");
   });
 
@@ -171,5 +175,24 @@ describe("Todo Dashboard E2E", () => {
 
     cy.contains("Loading...").should("be.visible");
     cy.wait("@getTodosSlow");
+  });
+
+  it("shows offline cache banner when app is offline with cached todos", () => {
+    cy.visit("/", {
+      onBeforeLoad(win) {
+        win.localStorage.setItem(
+          "todos_cache",
+          JSON.stringify([{ id: 1, title: "Cached Todo", completed: false }]),
+        );
+
+        Object.defineProperty(win.navigator, "onLine", {
+          configurable: true,
+          get: () => false,
+        });
+      },
+    });
+
+    cy.contains("You are offline. Showing cached todos.").should("be.visible");
+    cy.contains("Cached Todo").should("be.visible");
   });
 });
