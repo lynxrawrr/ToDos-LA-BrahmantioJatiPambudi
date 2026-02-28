@@ -1,10 +1,7 @@
-/* eslint-env jest */
-import React from "react";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import NotFound from "./NotFound";
 
-// Mock Header biar fokus test halaman NotFound aja
 jest.mock("../components/Header", () => () => <div data-testid="header-mock" />);
 
 describe("NotFound page", () => {

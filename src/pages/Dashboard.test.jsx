@@ -63,7 +63,6 @@ jest.mock("../components/TodoList", () => (props) => (
   </div>
 ));
 
-// Mock action creators
 jest.mock("../features/todos/todosSlice", () => ({
   addTodo: jest.fn((payload) => ({ type: "todos/addTodo", payload })),
   deleteTodo: jest.fn((id) => ({ type: "todos/deleteTodo", payload: id })),
@@ -84,8 +83,7 @@ function setupSelectorState({
   all = [],
   completed = [],
 } = {}) {
-  // Urutan useAppSelector di Dashboard:
-  // status, error, filter, mutation, all, completed
+  
   useAppSelector
     .mockReturnValueOnce(status)
     .mockReturnValueOnce(error)

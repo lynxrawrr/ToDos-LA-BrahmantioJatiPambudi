@@ -283,8 +283,6 @@ describe("todos thunks (with mocked API)", () => {
 
   test("toggleTodo updates item completion through thunk", async () => {
     const store = makeStore();
-
-    // seed state dulu
     await store.dispatch(
       addTodo.fulfilled(
         { id: 1, title: "Todo A", completed: false, userId: 1 },
@@ -307,8 +305,6 @@ describe("todos thunks (with mocked API)", () => {
 
   test("deleteTodo removes item through thunk", async () => {
     const store = makeStore();
-
-    // seed state dulu
     await store.dispatch(
       addTodo.fulfilled(
         { id: 1, title: "Todo A", completed: false, userId: 1 },

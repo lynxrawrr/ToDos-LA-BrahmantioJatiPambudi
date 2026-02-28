@@ -1,9 +1,7 @@
-/* eslint-env jest */
-
 describe("authSlice - initial state", () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.resetModules(); // penting: supaya module di-import ulang dan initialState dihitung ulang
+    jest.resetModules(); 
   });
 
   test("initial user is null when localStorage is empty", async () => {

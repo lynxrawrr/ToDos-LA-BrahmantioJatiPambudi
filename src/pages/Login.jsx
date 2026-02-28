@@ -22,7 +22,6 @@ export default function Login() {
     "dark:hover:border-[color-mix(in_srgb,var(--brand-purple-dark)_80%,transparent)] " +
     "dark:focus:ring-2 dark:focus:ring-[color-mix(in_srgb,var(--brand-purple-dark)_35%,transparent)]";
 
-  // handler: submit login form
   function submit(e) {
     e.preventDefault();
     const cleanEmail = email.trim();
