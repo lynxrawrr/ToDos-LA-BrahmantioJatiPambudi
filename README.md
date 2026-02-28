@@ -6,7 +6,7 @@ Sebuah aplikasi **Dashboard Todo App** untuk mengelola todo (Read, Create, Delet
 
 ## Live Demo
 
-`https://todos-la.vercel.app/`
+[Open Live Demo](https://todos-la.vercel.app/)
 
 ---
 
@@ -222,14 +222,10 @@ Snapshot test digunakan untuk membantu memastikan tampilan UI tertentu tetap kon
 
 ### End-to-End Testing
 
-E2E test ditulis menggunakan **Cypress** untuk memverifikasi alur utama aplikasi, seperti:
-
-- Fetch data todo dari API
-- Menambah todo
-- Menghapus todo
-- Toggle status todo
-- Alur login/register
-- Uji responsivitas halaman
+E2E test ditulis menggunakan **Cypress** untuk memverifikasi:
+- Auth dan Routing
+- Responsive
+- Todos
 
 ### Menjalankan Testing
 
@@ -249,7 +245,7 @@ npm run cypress:open
 
 ## PWA / Offline Support
 
-Aplikasi ini telah dikonfigurasi sebagai **Progressive Web App (PWA)** agar dapat memberikan pengalaman yang lebih baik di browser modern.
+Aplikasi ini telah dikonfigurasi sebagai **Progressive Web App (PWA)**.
 
 ### Kemampuan PWA
 
@@ -375,10 +371,6 @@ Beberapa hal yang menjadi fokus implementasi pada project ini:
 - Menambahkan test agar perubahan kode lebih aman
 - Menambahkan dukungan PWA dan offline fallback untuk meningkatkan reliability
 - Mengoptimalkan performa agar aplikasi tetap efisien
-
----
-
-[Open Live Demo](https://todos-la.vercel.app/)
 
 ---
 
